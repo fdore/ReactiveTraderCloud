@@ -74,21 +74,23 @@ export default class SpotTileView extends ViewBase {
     }
     return (
       <div className={pricingContainerClass}>
-        <PriceButton
-          className='spot-tile__price spot-tile__price--bid'
-          direction={Direction.Sell}
-          onExecute={() => this._onExecuteTrade(Direction.Sell)}
-          rate={model.currentSpotPrice.bid} />
+        <div className='spot-tile__price spot-tile__price--bid'>
+          <PriceButton
+            direction={Direction.Sell}
+            onExecute={() => this._onExecuteTrade(Direction.Sell)}
+            rate={model.currentSpotPrice.bid} />
+        </div>
         <div className='spot-tile__price-movement'>
           <PriceMovementIndicator
             priceMovementType={model.currentSpotPrice.priceMovementType}
             spread={model.currentSpotPrice.spread} />
         </div>
-        <PriceButton
-          className='spot-tile__price spot-tile__price--ask'
-          direction={Direction.Buy}
-          onExecute={() => this._onExecuteTrade(Direction.Buy)}
-          rate={model.currentSpotPrice.ask} />
+        <div className='spot-tile__price spot-tile__price--ask'>
+          <PriceButton
+            direction={Direction.Buy}
+            onExecute={() => this._onExecuteTrade(Direction.Buy)}
+            rate={model.currentSpotPrice.ask} />
+          </div>
       </div>
     );
   }

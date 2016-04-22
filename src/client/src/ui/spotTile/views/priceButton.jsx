@@ -5,11 +5,6 @@ import './priceButton.scss';
 
 const PriceButton = props =>  {
   const { direction, rate } = props;
-
-  let classes = classnames(
-    'price-button',
-    props.className
-  );
   let paddedPips =  rate.pips.toString().length  === 1
     ? `0${rate.pips}`
     : rate.pips;
@@ -17,9 +12,11 @@ const PriceButton = props =>  {
     ? `${rate.bigFigure}.`
     : rate.bigFigure;
   return (
-    <div className={classes} onClick={() => props.onExecute()}>
+    <div className='price-button' onClick={() => props.onExecute()}>
       <div className='price-button__direction'>{direction.name}</div>
-      <span className='price-button__big-figure'>{bigFigureDisplay}</span><span className='price-button__pip'>{paddedPips}</span><span className='price-button__tenth'>{rate.pipFraction}</span>
+      <div className='price__button-figure'>
+        <span className='price-button__big-figure'>{bigFigureDisplay}</span><span className='price-button__pip'>{paddedPips}</span><span className='price-button__tenth'>{rate.pipFraction}</span>
+      </div>
     </div>
   );
 };
