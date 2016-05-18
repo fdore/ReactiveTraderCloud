@@ -2,7 +2,7 @@ import Rx from 'rx';
 import _ from 'lodash';
 import { Trade, TradeNotification } from '../../services/model';
 import { logger } from '../';
-
+const DockingManager = require('exports?DockingManager!./dockingManager.js');
 const _log:logger.Logger = logger.create('OpenFin');
 
 const REQUEST_LIMIT_CHECK_TOPIC = 'request-limit-check';
@@ -19,6 +19,7 @@ export default class OpenFin {
     this.limitCheckSubscriber = null;
     if (this.isRunningInOpenFin) {
       this._initializeLimitChecker();
+      this._initializeDockingManager();
     }
   }
 
@@ -83,6 +84,12 @@ export default class OpenFin {
       });
   }
 
+  registerWindow(window) {
+    if (this._dockingManager) {
+      this._dockingManager.register(window);
+    }
+  }
+
   get _currentWindow() {
     return fin.desktop.Window.getCurrent();
   }
@@ -145,6 +152,12 @@ export default class OpenFin {
       }
     }, function(){
       app.run();
+    });
+  }
+
+  _initializeDockingManager() {
+    fin.desktop.main(() => {
+      this._dockingManager = new DockingManager();
     });
   }
 
