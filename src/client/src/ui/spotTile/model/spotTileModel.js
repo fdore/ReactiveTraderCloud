@@ -108,7 +108,7 @@ export default class SpotTileModel extends ModelBase {
   @observeEvent('popOutTile')
   _onPopOutTile() {
     this._log.info(`Popping out tile`);
-    this._regionManagerHelper.popout(this._tileName, 370, 190);
+    this._regionManagerHelper.popout(this._tileName, 370, 190, true);
   }
 
   @observeEvent('undockTile')

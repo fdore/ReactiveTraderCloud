@@ -23,7 +23,7 @@ export default class RegionManagerHelper {
   }
 
   // TODO remove width and height and let the view figure it out
-  popout(title, width:number, height:number) {
+  popout(title, width:number, height:number, dockable:boolean = false) {
     this._regionManager.removeFromRegion(this._regionName, this._model);
     this._regionManager.addToRegion(
       RegionNames.popout,
@@ -36,7 +36,8 @@ export default class RegionManagerHelper {
         regionSettings: {
           width,
           height,
-          title
+          title,
+          dockable
         }
       }
     );
