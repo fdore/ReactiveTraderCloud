@@ -8,6 +8,7 @@ import { RegionManager, RegionNames, view  } from '../../regions';
 import { TradeStatus } from '../../../services/model';
 import { SchedulerService, } from '../../../system';
 import { OpenFin } from '../../../system/openFin';
+import { getPopoutService } from '../../common/popout/';
 
 const DISMISS_NOTIFICATION_AFTER_X_IN_MS = 4000;
 const MAX_NOTIONAL_VALUE = 1000000000;
@@ -91,6 +92,8 @@ export default class SpotTileModel extends ModelBase {
   @observeEvent('init')
   _onInit() {
     this._log.info(`Cash tile starting for pair ${this.currencyPair.symbol}`);
+    this._tileName = `${this.currencyPair.symbol} Spot`;
+    this._popoutService = getPopoutService(this._openfin);
     this._subscribeToPriceStream();
     this._subscribeToConnectionStatus();
     this._regionManagerHelper.addToRegion();
@@ -105,7 +108,13 @@ export default class SpotTileModel extends ModelBase {
   @observeEvent('popOutTile')
   _onPopOutTile() {
     this._log.info(`Popping out tile`);
-    this._regionManagerHelper.popout(`${this.currencyPair.symbol} Spot`, 370, 190);
+    this._regionManagerHelper.popout(this._tileName, 370, 190);
+  }
+
+  @observeEvent('undockTile')
+  _onUndockTile() {
+    this._log.info(`Undock tile`);
+    this._popoutService.undockPopout(this._tileName);
   }
 
   @observeEvent('displayCurrencyChart')
