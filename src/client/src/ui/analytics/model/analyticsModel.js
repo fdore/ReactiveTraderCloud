@@ -21,7 +21,8 @@ export default class AnalyticsModel extends ModelBase {
   _pnlChartModel:PnlChartModel;
   _regionManagerHelper:RegionManagerHelper;
   _openFin:OpenFin;
-
+  _regionManager:RegionManager;
+  _regionName:string;
   isAnalyticsServiceConnected: Boolean;
 
   constructor(
@@ -33,12 +34,13 @@ export default class AnalyticsModel extends ModelBase {
   ) {
     super(modelId, router);
     this._analyticsService = analyticsService;
-
+    this._regionName = RegionNames.quickAccess;
     this.isAnalyticsServiceConnected = false;
     this._pnlChartModel = new PnlChartModel();
     this._positionsChartModel = new PositionsChartModel();
-    this._regionManagerHelper = new RegionManagerHelper(RegionNames.quickAccess, regionManager, this);
     this._openFin = openFin;
+    this._regionManager = regionManager;
+    this._regionManagerHelper = new RegionManagerHelper(this._regionName, regionManager, this);
   }
 
   get positionsChartModel() {
@@ -59,6 +61,10 @@ export default class AnalyticsModel extends ModelBase {
     _log.info(`Analytics model starting`);
     this._subscribeToConnectionStatus();
     this._regionManagerHelper.addToRegion();
+
+    if (this._regionManager.shouldPopoutFromRegion(this._regionName, this._modelId)) {
+      this.router.publishEvent(this._modelId, 'popOutAnalytics', {});
+    }
   }
 
   @observeEvent('referenceDataLoaded')
