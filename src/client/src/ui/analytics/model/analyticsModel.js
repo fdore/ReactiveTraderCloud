@@ -8,6 +8,7 @@ import { PnlChartModel, PositionsChartModel, ChartModelBase } from './';
 import {
   AnalyticsRequest,
   PositionUpdates,
+  RegionSettings
 } from '../../../services/model';
 import { AnalyticsView } from '../views';
 import { OpenFin } from '../../../system/openFin';
@@ -22,6 +23,7 @@ export default class AnalyticsModel extends ModelBase {
   _regionManagerHelper:RegionManagerHelper;
   _openFin:OpenFin;
   _regionManager:RegionManager;
+  _regionSettings:RegionSettings;
   _regionName:string;
   isAnalyticsServiceConnected: Boolean;
 
@@ -36,11 +38,12 @@ export default class AnalyticsModel extends ModelBase {
     this._analyticsService = analyticsService;
     this._regionName = RegionNames.quickAccess;
     this.isAnalyticsServiceConnected = false;
+    this._regionSettings = new RegionSettings('Analytics', 400, 800);
     this._pnlChartModel = new PnlChartModel();
     this._positionsChartModel = new PositionsChartModel();
     this._openFin = openFin;
     this._regionManager = regionManager;
-    this._regionManagerHelper = new RegionManagerHelper(this._regionName, regionManager, this);
+    this._regionManagerHelper = new RegionManagerHelper(this._regionName, regionManager, this, this._regionSettings);
   }
 
   get positionsChartModel() {
@@ -60,11 +63,7 @@ export default class AnalyticsModel extends ModelBase {
   _onInit() {
     _log.info(`Analytics model starting`);
     this._subscribeToConnectionStatus();
-    this._regionManagerHelper.addToRegion();
-
-    if (this._regionManager.shouldPopoutFromRegion(this._regionName, this._modelId)) {
-      this.router.publishEvent(this._modelId, 'popOutAnalytics', {});
-    }
+    this._regionManagerHelper.init();
   }
 
   @observeEvent('referenceDataLoaded')
@@ -76,7 +75,7 @@ export default class AnalyticsModel extends ModelBase {
   @observeEvent('popOutAnalytics')
   _onPopOutAnalytics() {
     _log.info(`Popping out analytics`);
-    this._regionManagerHelper.popout('Analytics', 400, 800);
+    this._regionManagerHelper.popout();
   }
 
   _subscribeToAnalyticsStream() {

@@ -7,8 +7,7 @@ import { logger } from '../../../system';
 import { ModelBase, RegionManagerHelper } from '../../common';
 import { RegionManager, RegionNames, view  } from '../../regions';
 import { OpenFin } from '../../../system/openFin';
-import { Trade, TradesUpdate, TradeStatus, TradeNotification } from '../../../services/model';
-
+import { Trade, TradesUpdate, TradeStatus, TradeNotification, RegionSettings } from '../../../services/model';
 import { BlotterView } from '../views';
 
 var _log:logger.Logger = logger.create('BlotterModel');
@@ -19,6 +18,7 @@ export default class BlotterModel extends ModelBase {
   _regionManagerHelper:RegionManagerHelper;
   _regionManager:RegionManager;
   _regionName:string;
+  _regionSettings:RegionSettings;
   trades:Array<Trade>;
   isConnected:boolean;
 
@@ -35,7 +35,8 @@ export default class BlotterModel extends ModelBase {
     this.isConnected = false;
     this._regionManager = regionManager;
     this._regionName = RegionNames.blotter;
-    this._regionManagerHelper = new RegionManagerHelper(this._regionName, regionManager, this);
+    this._regionSettings = new RegionSettings('Blotter', 850, 280);
+    this._regionManagerHelper = new RegionManagerHelper(this._regionName, regionManager, this, this._regionSettings);
     this._openFin = openFin;
   }
 
@@ -43,12 +44,8 @@ export default class BlotterModel extends ModelBase {
   _onInit() {
     _log.info(`Blotter starting`);
     this._subscribeToConnectionStatus();
-    this._regionManagerHelper.addToRegion();
     this.subscribeToOpenFinEvents();
-
-    if (this._regionManager.shouldPopoutFromRegion(this._regionName, this._modelId)) {
-      this.router.publishEvent(this._modelId, 'tearOffBlotter', {});
-    }
+    this._regionManagerHelper.init();
   }
 
   @observeEvent('referenceDataLoaded')
@@ -60,7 +57,7 @@ export default class BlotterModel extends ModelBase {
   @observeEvent('tearOffBlotter')
   _onTearOffBlotter() {
     _log.info(`Popping out blotter`);
-    this._regionManagerHelper.popout('Blotter', 850, 280);
+    this._regionManagerHelper.popout();
   }
 
   subscribeToOpenFinEvents(){
