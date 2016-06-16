@@ -1,7 +1,10 @@
 import { logger } from '../../system';
 import { SpotPrice, Rate, CurrencyPair, PriceMovementType, Spread } from '../model';
-import { ReferenceDataService } from '../';
+import ReferenceDataService from '../referenceDataService';
+import { inject } from 'aurelia-dependency-injection';
 
+
+@inject(ReferenceDataService)
 export default class PriceMapper {
   _referenceDataService:ReferenceDataService;
 

@@ -1,3 +1,5 @@
+import 'aurelia-polyfills';
+import { Container, inject } from 'aurelia-dependency-injection';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BlotterModel } from './ui/blotter/model';
@@ -16,6 +18,7 @@ import { default as espRouter } from './system/router';
 import { ShellView } from './ui/shell/views';
 import { RegionModel, SingleItemRegionModel, PopoutRegionModel } from './ui/regions/model';
 import { RegionManager, RegionNames } from './ui/regions';
+
 import config from 'config.json';
 
 import {
@@ -29,6 +32,7 @@ import {
 } from './services';
 import { WellKnownModelIds } from './';
 
+@inject(OpenFin, SchedulerService, Connection, ReferenceDataService, PricingService, BlotterService)
 class AppBootstrapper {
   _connection:Connection;
   _referenceDataService:ReferenceDataService;
@@ -38,6 +42,21 @@ class AppBootstrapper {
   _analyticsService:AnalyticsService;
   _compositeStatusService:CompositeStatusService;
   _schedulerService:SchedulerService;
+
+  constructor(openFin:OpenFin,
+              schedulerService:SchedulerService,
+              connection:Connection,
+              referenceDataService:ReferenceDataService,
+              pricingService:PricingService,
+              blotterService:BlotterService
+  ) {
+    this._openFin = openFin;
+    this._schedulerService = schedulerService;
+    this._connection = connection;
+    this._referenceDataService = referenceDataService;
+    this._pricingService = pricingService;
+    this._blotterService = blotterService;
+  }
 
   run() {
     this.startServices();
@@ -50,22 +69,21 @@ class AppBootstrapper {
   }
 
   startServices() {
-    const user:User = FakeUserRepository.currentUser;
-    const realm = 'com.weareadaptive.reactivetrader';
-    const url = this.endpointURL;
-
-    this._schedulerService = new SchedulerService();
-    this._connection = new Connection(
-      user.code,
-      new AutobahnConnectionProxy(url, realm),
-      this._schedulerService
-    );
+    // const user:User = FakeUserRepository.currentUser;
+    // const realm = 'com.weareadaptive.reactivetrader';
+    // const url = this.endpointURL;
+    //
+    // // this._schedulerService = new SchedulerService();
+    // this._connection = new Connection(
+    //   user.code,
+    //   new AutobahnConnectionProxy(url, realm),
+    //   this._schedulerService
+    // );
 
     // in a larger app you'd put a container in here (shameless plug: https://github.com/KeithWoods/microdi-js, but there are many offerings in this space).
-    this._openFin = new OpenFin();
-    this._referenceDataService = new ReferenceDataService(ServiceConst.ReferenceServiceKey, this._connection, this._schedulerService);
-    this._pricingService = new PricingService(ServiceConst.PricingServiceKey, this._connection, this._schedulerService, this._referenceDataService);
-    this._blotterService = new BlotterService(ServiceConst.BlotterServiceKey, this._connection, this._schedulerService, this._referenceDataService, this._openFin);
+    // this._referenceDataService = new ReferenceDataService(ServiceConst.ReferenceServiceKey, this._connection, this._schedulerService);
+    // this._pricingService = new PricingService(ServiceConst.PricingServiceKey, this._connection, this._schedulerService, this._referenceDataService);
+    //this._blotterService = new BlotterService(ServiceConst.BlotterServiceKey, this._connection, this._schedulerService, this._referenceDataService, this._openFin);
     this._executionService = new ExecutionService(ServiceConst.ExecutionServiceKey, this._connection, this._schedulerService, this._referenceDataService, this._openFin);
     this._analyticsService = new AnalyticsService(ServiceConst.AnalyticsServiceKey, this._connection, this._schedulerService, this._referenceDataService);
     this._compositeStatusService = new CompositeStatusService(this._connection, this._pricingService, this._referenceDataService, this._blotterService, this._executionService, this._analyticsService);
@@ -164,5 +182,19 @@ class AppBootstrapper {
 let runBootstrapper = location.pathname === '/' && location.hash.length === 0;
 // if we're not the root we (perhaps a popup) we never re-run the bootstrap logic
 if(runBootstrapper) {
-  new AppBootstrapper().run();
+  debugger;
+  const container = new Container();
+  container.registerSingleton(Connection, () => {
+    const url = config.overwriteServerEndpoint ? config.serverEndPointUrl : location.hostname;
+    const realm = 'com.weareadaptive.reactivetrader';
+    const user:User = FakeUserRepository.currentUser;
+    let schedulerService = new SchedulerService();
+    return new Connection(
+      user.code,
+      new AutobahnConnectionProxy(url, realm),
+      schedulerService
+    );
+  });
+  const appBootstrapper = container.get(AppBootstrapper);
+  appBootstrapper.run();
 }

@@ -1,7 +1,9 @@
 import _ from 'lodash';
 import { Trade, Direction, TradeStatus, TradesUpdate } from '../model';
-import { ReferenceDataService } from '../';
+import ReferenceDataService from '../referenceDataService';
+import { inject } from 'aurelia-dependency-injection';
 
+@inject(ReferenceDataService)
 export default class TradeMapper {
   _referenceDataService:ReferenceDataService;
 

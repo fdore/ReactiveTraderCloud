@@ -3,7 +3,7 @@ import { Connection, ServiceBase } from '../system/service';
 import { AnalyticsRequest, PositionUpdates } from './model';
 import { PositionsMapper } from './mappers';
 import { Guard, logger, SchedulerService, RetryPolicy } from '../system';
-import { ReferenceDataService } from './';
+import ReferenceDataService from './referenceDataService';
 
 var _log:logger.Logger = logger.create('AnalyticsService');
 

@@ -1,17 +1,18 @@
 import Rx from 'rx';
-import { SpotPrice, GetSpotStreamRequest } from './model';
+import { SpotPrice, GetSpotStreamRequest, ServiceConst } from './model';
 import { PriceMapper } from './mappers';
-import { ReferenceDataService } from './';
 import { Connection, ServiceBase } from '../system/service';
 import { logger, SchedulerService, RetryPolicy } from '../system';
+import { inject } from 'aurelia-dependency-injection';
 
 var _log:logger.Logger = logger.create('PricingService');
 
+@inject(Connection, SchedulerService, PriceMapper)
 export default class PricingService extends ServiceBase {
 
-  constructor(serviceType:string, connection:Connection, schedulerService:SchedulerService, referenceDataService:ReferenceDataService) {
-    super(serviceType, connection, schedulerService);
-    this._priceMapper = new PriceMapper(referenceDataService);
+  constructor(connection:Connection, schedulerService:SchedulerService, priceMapper:PriceMapper) {
+    super(ServiceConst.PricingServiceKey, connection, schedulerService);
+    this._priceMapper = priceMapper;
   }
 
   getSpotPriceStream(request:GetSpotStreamRequest):Rx.Observable<SpotPrice> {

@@ -1,12 +1,16 @@
 import _ from 'lodash';
 import Rx from 'rx';
-import { ReferenceDataMapper } from './mappers';
-import { CurrencyPairUpdates, CurrencyPairUpdate, CurrencyPair, UpdateType } from './model';
+import ReferenceDataMapper from './mappers/referenceDataMapper';
+import { CurrencyPairUpdates, CurrencyPairUpdate, CurrencyPair, UpdateType, ServiceConst } from './model';
 import { logger, SchedulerService, RetryPolicy } from '../system';
-import { Connection, ServiceBase } from '../system/service';
+import { Connection } from '../system/service';
+import ServiceBase from '../system/service/serviceBase';
+
+import { inject } from 'aurelia-dependency-injection';
 
 var _log:logger.Logger = logger.create('ReferenceDataService');
 
+@inject(Connection, SchedulerService)
 export default class ReferenceDataService extends ServiceBase {
   _hasLoadedSubject:Rx.Subject<boolean>;
   _referenceDataMapper:ReferenceDataMapper;
@@ -14,9 +18,9 @@ export default class ReferenceDataService extends ServiceBase {
   _currencyPairCache:Object;
   _loadCalled:boolean;
 
-  constructor(serviceType:string, connection:Connection, schedulerService:SchedulerService) {
-    super(serviceType, connection, schedulerService);
-    this._referenceDataMapper = new ReferenceDataMapper();
+  constructor(connection:Connection, schedulerService:SchedulerService) {
+    super(ServiceConst.ReferenceServiceKey, connection, schedulerService);
+    this._referenceDataMapper = null;
     this._referenceDataStreamConnectable = this._referenceDataStream().publish();
     this._loadCalled = false;
     this._hasLoadedSubject = new Rx.AsyncSubject();

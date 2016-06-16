@@ -4,7 +4,7 @@ import { ExecuteTradeRequest, ExecuteTradeResponse } from './model';
 import { TradeMapper } from './mappers';
 import { logger, SchedulerService } from '../system';
 import { Connection, ServiceBase } from '../system/service';
-import { ReferenceDataService } from './';
+import ReferenceDataService from './referenceDataService';
 
 const _log:logger.Logger = logger.create('ExecutionService');
 
