@@ -1,10 +1,11 @@
+import Connection from '../system/service/connection';
+import ServiceBase from '../system/service/serviceBase';
 import _ from 'lodash';
 import Rx from 'rx';
 import { ReferenceDataMapper } from './mappers';
 import { CurrencyPairUpdates, CurrencyPairUpdate, CurrencyPair, UpdateType, ServiceConst } from './model';
 import { logger, SchedulerService, RetryPolicy } from '../system';
-import { default as Connection } from '../system/service/connection';
-import ServiceBase from '../system/service/serviceBase';
+
 
 import { inject } from 'aurelia-dependency-injection';
 

@@ -176,21 +176,26 @@ let runBootstrapper = location.pathname === '/' && location.hash.length === 0;
 // if we're not the root we (perhaps a popup) we never re-run the bootstrap logic
 if(runBootstrapper) {
   const container = new Container();
-  let schedulerService = new SchedulerService();
-  container.registerSingleton(Connection, () => {
+  container.registerSingleton(AutobahnConnectionProxy, () => {
     const url = config.overwriteServerEndpoint ? config.serverEndPointUrl : location.hostname;
     const realm = 'com.weareadaptive.reactivetrader';
-    const user:User = FakeUserRepository.currentUser;
-
-    return new Connection(
-      user.code,
-      new AutobahnConnectionProxy(url, realm),
-      schedulerService
-    );
+    return new AutobahnConnectionProxy(url, realm);
   });
-  debugger;
+  container.registerHandler('username', () => FakeUserRepository.currentUser.code);
+  // container.registerSingleton(Connection, () => {
+  //   const url = config.overwriteServerEndpoint ? config.serverEndPointUrl : location.hostname;
+  //   const realm = 'com.weareadaptive.reactivetrader';
+  //   const user:User = FakeUserRepository.currentUser;
+  //
+  //   return new Connection(
+  //     user.code,
+  //     new AutobahnConnectionProxy(url, realm),
+  //     container.get(SchedulerService)
+  //   );
+  // });
+
   container.registerSingleton(ReferenceDataService, () => {
-    return new ReferenceDataService(container.get(Connection), schedulerService, container.get(ReferenceDataMapper));
+    return new ReferenceDataService(container.get(Connection), container.get(SchedulerService), container.get(ReferenceDataMapper));
   });
   const appBootstrapper = container.get(AppBootstrapper);
   appBootstrapper.run();

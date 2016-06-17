@@ -8,12 +8,14 @@ import SchedulerService from '../schedulerService';
 import ConnectionStatus from './connectionStatus';
 import {ConnectionType} from '../../services/model';
 import {ConnectionTypeMapper} from '../../services/mappers';
+import { inject } from 'aurelia-dependency-injection';
 
 const _log:logger.Logger = logger.create('Connection');
 
 /**
  * Represents a Connection to autobahn
  */
+@inject('username', AutobahnConnectionProxy, SchedulerService)
 export default class Connection extends DisposableBase {
   _userName:string;
   _autobahn:AutobahnConnectionProxy;
