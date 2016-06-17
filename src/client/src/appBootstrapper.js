@@ -10,7 +10,8 @@ import { SidebarModel } from './ui/sidebar/model';
 import { ShellModel } from './ui/shell/model';
 import { ChromeModel } from './ui/common/components/chrome/model';
 import { SpotTileFactory, SpotTileLoader } from './ui/spotTile';
-import { User, ServiceConst } from './services/model';
+import { User } from './services/model';
+import { ReferenceDataMapper } from './services/mappers';
 import { SchedulerService, } from './system';
 import { AutobahnConnectionProxy, Connection } from './system/service';
 import { OpenFin } from './system/openFin';
@@ -32,7 +33,16 @@ import {
 } from './services';
 import { WellKnownModelIds } from './';
 
-@inject(OpenFin, SchedulerService, Connection, ReferenceDataService, PricingService, BlotterService)
+@inject(OpenFin,
+  SchedulerService,
+  Connection,
+  PricingService,
+  BlotterService,
+  ReferenceDataService,
+  ExecutionService,
+  AnalyticsService,
+  CompositeStatusService
+)
 class AppBootstrapper {
   _connection:Connection;
   _referenceDataService:ReferenceDataService;
@@ -46,9 +56,12 @@ class AppBootstrapper {
   constructor(openFin:OpenFin,
               schedulerService:SchedulerService,
               connection:Connection,
-              referenceDataService:ReferenceDataService,
               pricingService:PricingService,
-              blotterService:BlotterService
+              blotterService:BlotterService,
+              referenceDataService:ReferenceDataService,
+              executionService:ExecutionService,
+              analyticsService:AnalyticsService,
+              compositeStatusService:CompositeStatusService
   ) {
     this._openFin = openFin;
     this._schedulerService = schedulerService;
@@ -56,6 +69,9 @@ class AppBootstrapper {
     this._referenceDataService = referenceDataService;
     this._pricingService = pricingService;
     this._blotterService = blotterService;
+    this._executionService = executionService;
+    this._analyticsService = analyticsService;
+    this._compositeStatusService = compositeStatusService;
   }
 
   run() {
@@ -64,30 +80,7 @@ class AppBootstrapper {
     this.displayUi();
   }
 
-  get endpointURL() {
-    return config.overwriteServerEndpoint ? config.serverEndPointUrl : location.hostname;
-  }
-
   startServices() {
-    // const user:User = FakeUserRepository.currentUser;
-    // const realm = 'com.weareadaptive.reactivetrader';
-    // const url = this.endpointURL;
-    //
-    // // this._schedulerService = new SchedulerService();
-    // this._connection = new Connection(
-    //   user.code,
-    //   new AutobahnConnectionProxy(url, realm),
-    //   this._schedulerService
-    // );
-
-    // in a larger app you'd put a container in here (shameless plug: https://github.com/KeithWoods/microdi-js, but there are many offerings in this space).
-    // this._referenceDataService = new ReferenceDataService(ServiceConst.ReferenceServiceKey, this._connection, this._schedulerService);
-    // this._pricingService = new PricingService(ServiceConst.PricingServiceKey, this._connection, this._schedulerService, this._referenceDataService);
-    //this._blotterService = new BlotterService(ServiceConst.BlotterServiceKey, this._connection, this._schedulerService, this._referenceDataService, this._openFin);
-    this._executionService = new ExecutionService(ServiceConst.ExecutionServiceKey, this._connection, this._schedulerService, this._referenceDataService, this._openFin);
-    this._analyticsService = new AnalyticsService(ServiceConst.AnalyticsServiceKey, this._connection, this._schedulerService, this._referenceDataService);
-    this._compositeStatusService = new CompositeStatusService(this._connection, this._pricingService, this._referenceDataService, this._blotterService, this._executionService, this._analyticsService);
-
     // connect/load all the services
     this._pricingService.connect();
     this._blotterService.connect();
@@ -182,18 +175,22 @@ class AppBootstrapper {
 let runBootstrapper = location.pathname === '/' && location.hash.length === 0;
 // if we're not the root we (perhaps a popup) we never re-run the bootstrap logic
 if(runBootstrapper) {
-  debugger;
   const container = new Container();
+  let schedulerService = new SchedulerService();
   container.registerSingleton(Connection, () => {
     const url = config.overwriteServerEndpoint ? config.serverEndPointUrl : location.hostname;
     const realm = 'com.weareadaptive.reactivetrader';
     const user:User = FakeUserRepository.currentUser;
-    let schedulerService = new SchedulerService();
+
     return new Connection(
       user.code,
       new AutobahnConnectionProxy(url, realm),
       schedulerService
     );
+  });
+  debugger;
+  container.registerSingleton(ReferenceDataService, () => {
+    return new ReferenceDataService(container.get(Connection), schedulerService, container.get(ReferenceDataMapper));
   });
   const appBootstrapper = container.get(AppBootstrapper);
   appBootstrapper.run();

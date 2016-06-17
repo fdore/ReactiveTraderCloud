@@ -3,7 +3,9 @@ import { ServiceStatusLookup } from './model';
 import { PricingService, ReferenceDataService, BlotterService, ExecutionService, AnalyticsService } from './';
 import { Connection, ServiceStatus } from './../system/service';
 import { ConnectionType } from './../services/model';
+import { inject } from 'aurelia-dependency-injection';
 
+@inject(Connection, PricingService, ReferenceDataService, BlotterService, ExecutionService, AnalyticsService)
 export default class CompositeStatusService extends DisposableBase {
   _connection:Connection;
   _pricingService:PricingService;

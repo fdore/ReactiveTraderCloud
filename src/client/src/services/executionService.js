@@ -1,26 +1,26 @@
 import Rx from 'rx';
 import { OpenFin } from '../system/openFin';
-import { ExecuteTradeRequest, ExecuteTradeResponse } from './model';
+import { ExecuteTradeRequest, ExecuteTradeResponse, ServiceConst } from './model';
 import { TradeMapper } from './mappers';
 import { logger, SchedulerService } from '../system';
 import { Connection, ServiceBase } from '../system/service';
-import ReferenceDataService from './referenceDataService';
+import { inject } from 'aurelia-dependency-injection';
 
 const _log:logger.Logger = logger.create('ExecutionService');
 
+@inject(Connection, SchedulerService, OpenFin, TradeMapper)
 export default class ExecutionService extends ServiceBase {
 
   static EXECUTION_CLIENT_TIMEOUT_MS  =  2000;
   static EXECUTION_REQUEST_TIMEOUT_MS = 30000;
 
-  constructor(serviceType:string,
-              connection:Connection,
+  constructor(connection:Connection,
               schedulerService:SchedulerService,
-              referenceDataService:ReferenceDataService,
-              openFin:OpenFin) {
-    super(serviceType, connection, schedulerService);
+              openFin:OpenFin,
+              tradeMapper:TradeMapper) {
+    super(ServiceConst.ExecutionServiceKey, connection, schedulerService);
     this._openFin = openFin;
-    this._tradeMapper = new TradeMapper(referenceDataService);
+    this._tradeMapper = tradeMapper;
   }
 
   executeTrade(executeTradeRequest:ExecuteTradeRequest):Rx.Observable<ExecuteTradeResponse> {

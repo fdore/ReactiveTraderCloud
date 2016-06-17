@@ -1,17 +1,19 @@
 import Rx from 'rx';
 import { Connection, ServiceBase } from '../system/service';
-import { AnalyticsRequest, PositionUpdates } from './model';
+import { AnalyticsRequest, PositionUpdates, ServiceConst } from './model';
 import { PositionsMapper } from './mappers';
 import { Guard, logger, SchedulerService, RetryPolicy } from '../system';
-import ReferenceDataService from './referenceDataService';
+import { ReferenceDataService } from './';
+import { inject } from 'aurelia-dependency-injection';
 
 var _log:logger.Logger = logger.create('AnalyticsService');
 
+@inject(Connection, SchedulerService, PositionsMapper)
 export default class AnalyticsService extends ServiceBase {
 
-  constructor(serviceType:string, connection:Connection, schedulerService:SchedulerService, referenceDataService:ReferenceDataService) {
-    super(serviceType, connection, schedulerService);
-    this._positionsMapper = new PositionsMapper(referenceDataService);
+  constructor(connection:Connection, schedulerService:SchedulerService, positionsMapper:PositionsMapper) {
+    super(ServiceConst.AnalyticsServiceKey, connection, schedulerService);
+    this._positionsMapper = positionsMapper;
   }
 
   getAnalyticsStream(analyticsRequest:AnalyticsRequest):Rx.Observable<PositionUpdates> {
