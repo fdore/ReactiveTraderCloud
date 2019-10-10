@@ -119,7 +119,6 @@ export default class FakeUserRepository {
   /**
    * A hardcoded current users that gets set on app start up. There is no concept of sessions or users on the backend.
    */
-  static get currentUser() {
-    return currentUser
+  static get currentUser() {return currentUser
   }
 }
