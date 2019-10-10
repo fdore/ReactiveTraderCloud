@@ -114,6 +114,8 @@ const currentUser: User = {
 }
 console.info(LOG_NAME, `Will use user ${currentUser.firstName} ${currentUser.lastName} (${currentUser.code}) for this session`,)
 
+console.info(LOG_NAME, `Will use user ${currentUser.firstName} ${currentUser.lastName} (${currentUser.code}) for this session`,)
+
 export default class FakeUserRepository {
   /**
    * A hardcoded current users that gets set on app start up. There is no concept of sessions or users on the backend.
