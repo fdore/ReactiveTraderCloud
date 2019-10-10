@@ -113,10 +113,7 @@ const currentUser: User = {
   code: userDetails.shortCode,
 }
 
-console.info(
-  LOG_NAME,
-  `Will use user ${currentUser.firstName} ${currentUser.lastName} (${currentUser.code}) for this session`,
-)
+console.info(LOG_NAME, `Will use user ${currentUser.firstName} ${currentUser.lastName} (${currentUser.code}) for this session`,)
 
 export default class FakeUserRepository {
   /**
