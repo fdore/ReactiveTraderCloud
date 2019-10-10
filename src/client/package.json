@@ -36,7 +36,6 @@
     "openfin": "openfin -c public/config/openfin/local.json -l",
     "openfin:launcher": "openfin -c public/config/openfin/launcher-local.json -l",
     "openfin-build-installer": "node ./lib/downloadInstaller.js",
-    "precommit": "lint-staged",
     "storybook": "start-storybook -p 6006 -c .storybook",
     "storybook:build": "build-storybook -c .storybook -o storybook/build",
     "sleep": "sleep 5",
@@ -59,6 +58,11 @@
       "eslint --fix ./src",
       "git add"
     ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.21",
