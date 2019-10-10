@@ -7,7 +7,8 @@
     "start:dev": "nodemon --watch 'src/**/*.ts' --exec 'node -r ts-node/register -r tsconfig-paths/register --inspect' src/index.ts",
     "start": "cross-env NODE_ENV=production node -r tsconfig-paths/register lib/index.js",
     "build": "cross-env NODE_ENV=production tsc -p .",
-    "eslint": "eslint --ext .ts ./src"
+    "eslint": "eslint --ext .ts ./src",
+    "precommit": "lint-staged"
   },
   "keywords": [
     "NLP"

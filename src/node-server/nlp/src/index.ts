@@ -73,7 +73,6 @@ session$
 session$.pipe(takeUntil(exit$)).subscribe(session => {
   const topic = `${hostInstance}.getNlpIntent`;
   logger.info(`Registering ${topic}`);
-
   session.register(topic, (request: NlpIntentRequest) => {
     logger.info(`Received request: ${JSON.stringify(request)}`);
 

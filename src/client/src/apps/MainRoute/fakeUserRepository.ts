@@ -105,24 +105,21 @@ const fakeUserDetails = [
   },
 ]
 
-const userDetails = fakeUserDetails[Math.floor(Math.random() * fakeUserDetails.length)]
+const userDetails =
+  fakeUserDetails[Math.floor(Math.random() * fakeUserDetails.length)]
 
 const currentUser: User = {
-  firstName: userDetails.firstName,
-  lastName: userDetails.lastName,
+  firstName: userDetails.firstName, lastName:   userDetails.lastName,
   code: userDetails.shortCode,
 }
 
 console.info(
-  LOG_NAME,
-  `Will use user ${currentUser.firstName} ${currentUser.lastName} (${currentUser.code}) for this session`,
-)
+  LOG_NAME, `Will use user ${currentUser.firstName} ${currentUser.lastName} (${currentUser.code}) for this session`,)
 
 export default class FakeUserRepository {
   /**
    * A hardcoded current users that gets set on app start up. There is no concept of sessions or users on the backend.
    */
-  static get currentUser() {
-    return currentUser
+  static get currentUser() {return currentUser
   }
 }
